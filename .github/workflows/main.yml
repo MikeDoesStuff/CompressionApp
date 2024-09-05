@@ -6,15 +6,22 @@ on:
     branches:
       - main
       - master
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - main
       - master
+    tags:
+      - 'v*'
   # Trigger on tag push to create a release
   workflow_dispatch:
   release:
     types: [created]
-  
+    tags:
+      - 'v*'
+permissions:
+  contents: write 
 jobs:
   build:
     runs-on: windows-latest
