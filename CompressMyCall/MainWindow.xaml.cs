@@ -66,7 +66,7 @@ public partial class MainWindow : Window
     private async Task CompressFileAsync(string inputFilePath)
     {
         string outputFilePath = Path.ChangeExtension(inputFilePath, null) + "_COMPRESSED.mp3";
-
+ 
         try
         {
             using (var reader = new AudioFileReader(inputFilePath))
