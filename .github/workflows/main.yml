@@ -1,0 +1,36 @@
+name: Build and Publish .NET
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '7.0.x' # Ensure this is compatible with your project
+
+    - name: Install dependencies
+      run: dotnet restore CompressMyCall.sln
+
+    - name: Build solution
+      run: |
+        dotnet publish CompressMyCall.sln -c Release -r win-x86 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DeleteExistingFiles=true
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: published-app
+        path: |
+          **/bin/Release/net7.0-windows/win-x86/publish/
