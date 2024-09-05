@@ -10,7 +10,10 @@ on:
     branches:
       - main
       - master
+  # Trigger on tag push to create a release
   workflow_dispatch:
+  release:
+    types: [created]
   
 jobs:
   build:
@@ -32,9 +35,34 @@ jobs:
       run: |
         dotnet publish CompressMyCall.sln -c Release -r win-x86 --self-contained true /p:PublishSingleFile=true /p:IncludeNativeLibrariesForSelfExtract=true /p:DeleteExistingFiles=true
 
+    - name: Upload the built executable only
+      run: |
+        mkdir -p ./publish
+        cp **/bin/Release/net7.0-windows/win-x86/publish/CompressMyCall.exe ./publish/CompressMyCall.exe
+      continue-on-error: false
+
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: published-app
-        path: |
-          **/bin/Release/net7.0-windows/win-x86/publish/
+        name: CompressMyCall.exe
+        path: ./publish/CompressMyCall.exe
+  release:
+    runs-on: windows-latest
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: CompressMyCall.exe
+          path: ./publish
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref }}
+          name: Release ${{ github.ref }}
+          body: |
+            Automated release of CompressMyCall.exe
+          draft: false
+          prerelease: false
+          files: ./publish/CompressMyCall.exe
