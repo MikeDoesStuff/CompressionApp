@@ -1,13 +1,17 @@
 name: Build and Publish .NET
 
 on:
+
   push:
     branches:
       - main
+      - master
   pull_request:
     branches:
       - main
-
+      - master
+  workflow_dispatch:
+  
 jobs:
   build:
     runs-on: windows-latest
